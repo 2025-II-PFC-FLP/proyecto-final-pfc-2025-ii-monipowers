@@ -60,4 +60,19 @@ object RiegoOptimo {
     (0 until pi.length - 1).map(j => d(pi(j))(pi(j + 1))).sum
   }
 
+  def generarProgramacionesRiego(f: Finca): Vector[ProgRiego] = {
+
+    def insertarEnTodasPosiciones(x: Int, v: Vector[Int]): Vector[Vector[Int]] =
+      v.indices.foldLeft(Vector(Vector(x) ++ v))((acc,i) => acc :+ (v.take(i+1) ++ Vector(x) ++ v.drop(i+1)))
+
+    def permutar(lista: Vector[Int]): Vector[ProgRiego] =
+      if(lista.isEmpty) Vector(Vector())
+      else {
+        val resto = permutar(lista.tail)
+        resto.flatMap(p => insertarEnTodasPosiciones(lista.head, p))
+      }
+
+    permutar((0 until f.length).toVector)
+  }
+
 }

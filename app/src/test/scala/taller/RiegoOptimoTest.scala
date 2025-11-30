@@ -162,4 +162,35 @@ class RiegoOptimoTest extends AnyFunSuite {
     assert(RiegoOptimo.costoMovilidad(Vector(), pi, d) == 20)
   }
 
+  test("generarProgramacionesRiego: finca de 1 tablón") {
+    val f = Vector((5,2,1))
+    val result = RiegoOptimo.generarProgramacionesRiego(f)
+    assert(result == Vector(Vector(0)))
+  }
+
+  test("generarProgramacionesRiego: finca de 2 tablones genera 2 programaciones") {
+    val f = Vector((5,2,1),(6,3,2))
+    val result = RiegoOptimo.generarProgramacionesRiego(f)
+    val esperado = Vector(Vector(0,1),Vector(1,0))
+    assert(result.toSet == esperado.toSet)
+  }
+
+  test("generarProgramacionesRiego: finca de 3 tablones produce 6 permutaciones") {
+    val f = Vector((4,2,1),(7,3,2),(5,1,3))
+    val result = RiegoOptimo.generarProgramacionesRiego(f)
+    assert(result.size == 6)
+  }
+
+  test("generarProgramacionesRiego: cada programación contiene todos los tablones sin repetir") {
+    val f = Vector((5,2,1),(7,3,2),(8,4,3))
+    val r = RiegoOptimo.generarProgramacionesRiego(f)
+    assert(r.forall(pi => pi.sorted == Vector(0,1,2)))
+  }
+
+  test("generarProgramacionesRiego: finca de 4 tablones produce 24 programaciones") {
+    val f = Vector((5,2,1),(6,3,2),(7,2,3),(9,4,1))
+    val r = RiegoOptimo.generarProgramacionesRiego(f)
+    assert(r.length == 24)
+  }
+
 }
