@@ -23,8 +23,7 @@ object RiegoOptimo {
       if (i < j) v(i)(j)
       else if (i == j) 0
       else v(j)(i)
-    )
-  }
+    )  }
 
   def tsup(f: Finca, i: Int): Int = f(i)._1
   def treg(f: Finca, i: Int): Int = f(i)._2
@@ -58,6 +57,31 @@ object RiegoOptimo {
 
   def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
     (0 until pi.length - 1).map(j => d(pi(j))(pi(j + 1))).sum
+  }
+
+  def generarProgramacionesRiego(f: Finca): Vector[ProgRiego] = {
+
+    def insertarEnTodasPosiciones(x: Int, v: Vector[Int]): Vector[Vector[Int]] =
+      v.indices.foldLeft(Vector(Vector(x) ++ v))((acc,i) => acc :+ (v.take(i+1) ++ Vector(x) ++ v.drop(i+1)))
+
+    def permutar(lista: Vector[Int]): Vector[ProgRiego] =
+      if(lista.isEmpty) Vector(Vector())
+      else {
+        val resto = permutar(lista.tail)
+        resto.flatMap(p => insertarEnTodasPosiciones(lista.head, p))
+      }
+
+    permutar((0 until f.length).toVector)
+  }
+
+  def ProgramacionRiegoOptimo(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    val todas = generarProgramacionesRiego(f)
+    val conCostos = todas.map { pi =>
+      val cr = costoRiegoFinca(f, pi)
+      val cm = costoMovilidad(f, pi, d)
+      (pi, cr + cm)
+    }
+    conCostos.minBy(_._2)
   }
 
 }
