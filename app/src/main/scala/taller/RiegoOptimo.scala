@@ -1,4 +1,7 @@
 package taller
+import common._
+import scala.collection.parallel.CollectionConverters._
+
 
 object RiegoOptimo {
   type Tablon = (Int, Int, Int)
@@ -81,6 +84,29 @@ object RiegoOptimo {
       val cm = costoMovilidad(f, pi, d)
       (pi, cr + cm)
     }
+    conCostos.minBy(_._2)
+  }
+
+  def costoRiegoFincaPar(f: Finca, pi: ProgRiego): Int = {
+    (0 until f.length).par.map(i => costoRiegoTablon(i, f, pi)).sum
+  }
+
+  def costoMovilidadPar(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    (0 until pi.length - 1).par.map(j => d(pi(j))(pi(j + 1))).sum
+  }
+
+  def generarProgramacionesRiegoPar(f: Finca): Vector[ProgRiego] =
+    generarProgramacionesRiego(f)
+
+  def ProgramacionRiegoOptimoPar(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    val todas = generarProgramacionesRiegoPar(f)
+
+    val conCostos = todas.par.map { pi =>
+      val cr = costoRiegoFincaPar(f, pi)
+      val cm = costoMovilidadPar(f, pi, d)
+      (pi, cr + cm)
+    }
+
     conCostos.minBy(_._2)
   }
 
